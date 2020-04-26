@@ -73,7 +73,7 @@ class SiameseNet(nn.Module):
         output_right = lstm(text_right, text_right_len)
         # output_right = [batch_size, hid_dim]
         # calculate l1 norm between left and right outputs
-        l1_norm = torch.norm((output_left, output_right), p=1, dim=1)
+        l1_norm = torch.norm(output_left - output_right, p=1, dim=1)
         # l1_norm = [batch_size]
         # compute Siamese distance
         distance = torch.exp(-l1_norm)

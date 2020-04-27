@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import time
 import math
 
@@ -20,7 +21,6 @@ class SiameseTrainer():
                  train_iterator,
                  val_iterator,
                  optimizer,
-                 criterion,
                  device,
                  weight_initializer=None):
         self.model = model
@@ -30,6 +30,7 @@ class SiameseTrainer():
         self.criterion = nn.MSELoss()
         self.weight_initializer = weight_initializer
         self.init_model()
+        self.device = device
 
     def init_model(self):
         if self.weight_initializer is None:
@@ -40,13 +41,15 @@ class SiameseTrainer():
     def train(self, clip):
         self.model.train()
         epoch_loss = 0
-        for batch in self.train_iterator:
-            text_left = batch.left
-            text_right = batch.right
-            # text_left = ([text_left_len, batch_size], text_left_len)
-            # text_right = ([text_right_len, batch_size], text_right_len)
-            scores = batch.score
-            # score = [batch_size]
+        for c, batch in enumerate(self.train_iterator):
+            print(c, 'th batch')
+            text_left = batch.text_left
+            text_right = batch.text_right
+            # text_left = [text_left_len, batch_size]
+            # text_right = [text_right_len, batch_size]
+            scores = batch.score # it returns a list
+            scores = torch.FloatTensor(scores).to(self.device)
+            # scores = [batch_size]
             predictions = self.model(text_left, text_right)
             # predictions = [batch_size]
             loss = self.criterion(predictions, scores)
@@ -60,11 +63,12 @@ class SiameseTrainer():
         self.model.eval()
         epoch_loss = 0
         for batch in iterator:
-            text_left = batch.left
-            text_right = batch.right
-            # text_left = ([text_left_len, batch_size], text_left_len)
-            # text_right = ([text_right_len, batch_size], text_right_len)
-            scores = batch.score
+            text_left = batch.text_left
+            text_right = batch.text_right
+            # text_left = [text_left_len, batch_size]
+            # text_right = [text_right_len, batch_size]
+            scores = batch.score # it returns a list
+            scores = torch.FloatTensor(scores).to(self.device)
             # score = [batch_size]
             predictions = self.model(text_left, text_right)
             # predictions = [batch_size]
@@ -72,12 +76,12 @@ class SiameseTrainer():
             epoch_loss += loss.item()
         return epoch_loss / len(self.val_iterator)
 
-    def epoch(self, n_epochs, clip):
+    def epoch(self, n_epochs, clip, model_name='siamense.pt'):
         best_valid_loss = float('inf')
         for epoch in range(n_epochs):
             start_time = time.time()
             train_loss = self.train(clip)
-            valid_loss = self.evaluate(self.iterator)
+            valid_loss = self.evaluate(self.val_iterator)
             epoch_mins, epoch_secs = _epoch_time(start_time)
             if valid_loss < best_valid_loss:
                 best_valid_loss = valid_loss

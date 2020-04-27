@@ -1,0 +1,14 @@
+# Test files
+*.ipynb
+.ipynb_checkpoints/
+.pytest_cache/
+
+
+# Model
+*.pt
+
+
+# pycache
+__pycache__/
+.shannet
+__pycache__/

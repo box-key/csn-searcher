@@ -26,18 +26,17 @@ class SiameseLSTM(nn.Module):
         self.dropout = nn.Dropout(dropout)
         self.device = device
 
-    def forward(self, text, text_len):
+    def forward(self, text):
         # sentence = [text_len, batch_size]
         embedded = self.embedding(text)
         # embedded = [text_len, batch_size, emb_dim]
-        packed_embedded = nn.utils.rnn.pack_padded_sequence(embedded, text_len)
-        output, (hidden, cell) = self.lstm(packed_embedded)
+        output, (hidden, cell) = self.lstm(embedded)
         # output = [text_len, batch_size, hid_dim*2]
         # hidden = [n_layers*2, batch_size, hid_dim]
         # cell = [n_layers*2, batch_size, hid_dim]
         # extract the the top layer of forward network and backword network
         # then, feed them into feedforward layer
-        output = self.fc(torch.cat((hidden[-2, :, :], hidden[-1, :, :]), dim=1))
+        output = self.fc_out(torch.cat((hidden[-2, :, :], hidden[-1, :, :]), dim=1))
         # output = [batch_size, hid_dim]
         return output
 
@@ -64,13 +63,11 @@ class SiameseNet(nn.Module):
         self.score_scale = torch.FloatTensor([score_scale]).to(device)
 
     def forward(self, text_left, text_right):
-        # text_left = (batch tensor, text_left_len)
-        # text_right = (batch tensor, text_right_len)
-        text_left, text_left_len = text_left
-        text_right, text_right_len = text_right
-        output_left = lstm(text_left, text_left_len)
+        # text_left = [text_left_len, batch_size]
+        # text_right = [text_right_len, batch_size]
+        output_left = self.lstm(text_left)
         # output_left = [batch_size, hid_dim]
-        output_right = lstm(text_right, text_right_len)
+        output_right = self.lstm(text_right)
         # output_right = [batch_size, hid_dim]
         # calculate l1 norm between left and right outputs
         l1_norm = torch.norm(output_left - output_right, p=1, dim=1)

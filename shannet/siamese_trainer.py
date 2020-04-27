@@ -41,8 +41,7 @@ class SiameseTrainer():
     def train(self, clip):
         self.model.train()
         epoch_loss = 0
-        for c, batch in enumerate(self.train_iterator):
-            print(c, 'th batch')
+        for batch in self.train_iterator:
             text_left = batch.text_left
             text_right = batch.text_right
             # text_left = [text_left_len, batch_size]
@@ -74,7 +73,7 @@ class SiameseTrainer():
             # predictions = [batch_size]
             loss = self.criterion(predictions, scores)
             epoch_loss += loss.item()
-        return epoch_loss / len(self.val_iterator)
+        return epoch_loss / len(iterator)
 
     def epoch(self, n_epochs, clip, model_name='siamense.pt'):
         best_valid_loss = float('inf')

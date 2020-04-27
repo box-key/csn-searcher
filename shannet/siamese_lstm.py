@@ -11,12 +11,13 @@ class SiameseLSTM(nn.Module):
                  hid_dim,
                  dropout,
                  n_layers,
+                 pad_idx,
                  device):
         super().__init__()
         self.input_dim = input_dim
         self.emb_dim = emb_dim
         self.hid_dim = hid_dim
-        self.embedding = nn.Embedding(input_dim, emb_dim)
+        self.embedding = nn.Embedding(input_dim, emb_dim, padding_idx=pad_idx)
         self.lstm = nn.LSTM(emb_dim,
                             hid_dim,
                             n_layers,
@@ -27,7 +28,7 @@ class SiameseLSTM(nn.Module):
         self.device = device
 
     def forward(self, text):
-        # sentence = [text_len, batch_size]
+        # text = [text_len, batch_size]
         embedded = self.embedding(text)
         # embedded = [text_len, batch_size, emb_dim]
         output, (hidden, cell) = self.lstm(embedded)
@@ -36,9 +37,9 @@ class SiameseLSTM(nn.Module):
         # cell = [n_layers*2, batch_size, hid_dim]
         # extract the the top layer of forward network and backword network
         # then, feed them into feedforward layer
-        output = self.fc_out(torch.cat((hidden[-2, :, :], hidden[-1, :, :]), dim=1))
+        hidden_toplayer = self.fc_out(torch.cat((hidden[-2, :, :], hidden[-1, :, :]), dim=1))
         # output = [batch_size, hid_dim]
-        return output
+        return hidden_toplayer
 
 
 class SiameseNet(nn.Module):
@@ -49,6 +50,7 @@ class SiameseNet(nn.Module):
                  hid_dim,
                  dropout,
                  n_layers,
+                 pad_idx,
                  device,
                  score_scale=1):
         super().__init__()
@@ -58,6 +60,7 @@ class SiameseNet(nn.Module):
                         hid_dim=hid_dim,
                         dropout=dropout,
                         n_layers=n_layers,
+                        pad_idx=pad_idx,
                         device=device
                     )
         self.score_scale = torch.FloatTensor([score_scale]).to(device)

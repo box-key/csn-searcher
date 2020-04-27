@@ -8,7 +8,8 @@
 *.pt
 
 
-# pycache
+# Cache
 __pycache__/
 .shannet
 __pycache__/
+.vector_cache/

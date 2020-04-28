@@ -18,7 +18,7 @@ class Article(MutableSet):
             self.title = title
 
     def __repr__(self):
-        return self.id
+        return self.title
 
     def __len__(self):
         return self.sections
@@ -57,6 +57,12 @@ class ArticleList(MutableMapping):
     def __keytransform__(self, id):
         return id
 
+    def get(self, title):
+        for key, value in self.dict:
+            if title == value:
+                return value
+        return -1
+
     def construct_list(self, articles, type='cord19'):
         if type=='cord19':
             articles = cord19_challenge_data_formatter(articles)
@@ -87,4 +93,4 @@ class ArticleList(MutableMapping):
                     section_paragraphs.clear()
                 curr_section_name = next_section_name
             # store the article into dictionary with its id
-            self[id] = _article
+            self.__setitem__(id, _article)

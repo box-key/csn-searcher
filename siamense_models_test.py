@@ -10,6 +10,7 @@ from torchtext.data import Iterator, BucketIterator
 from shannet import SiameseNet, SiameseTrainer
 from shannet.siamese_lstm import SiameseLSTM
 
+
 # load tokenizer
 scispacy_en = spacy.load('en_core_sci_sm')
 # define fields
@@ -48,12 +49,31 @@ train_iter, val_iter = BucketIterator.splits(
                             sort_within_batch=True,
                             sort_key=lambda x: len(x.text_left) + len(x.text_right)
                        )
-
+# parametes of model
 PAD_IDX = TEXT.vocab.stoi['<pad>']
 EMB_DIM = 300
 HID_DIM = 1024
 DROPOUT = 0.2
 N_LAYERS = 4
+# define model
+model = SiameseNet(
+            input_dim=len(TEXT.vocab),
+            emb_dim=EMB_DIM,
+            hid_dim=HID_DIM,
+            dropout=DROPOUT,
+            n_layers=N_LAYERS,
+            pad_idx=PAD_IDX,
+            device=device,
+        )
+adam = torch.optim.Adam(model.parameters(), lr=0.0001)
+# check initializer of trainer class
+trainer = SiameseTrainer(model=model,
+                         train_iterator=train_iter,
+                         val_iterator=val_iter,
+                         optimizer=adam,
+                         device=device)
+trainer.epoch(n_epochs=2, clip=1, model_name='siamense-lstm.pt')
+
 
 class TestSiamenseLSTM:
 
@@ -113,22 +133,3 @@ class TestSiamenseLSTM:
                                  optimizer=adam,
                                  device=device)
         trainer.epoch(n_epochs=2, clip=1, model_name='siamense-lstm.pt')
-
-model = SiameseNet(
-            input_dim=len(TEXT.vocab),
-            emb_dim=EMB_DIM,
-            hid_dim=HID_DIM,
-            dropout=DROPOUT,
-            n_layers=N_LAYERS,
-            pad_idx=PAD_IDX,
-            device=device,
-        )
-LEARNING_RATE = 0.0001
-adam = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
-# check initializer of trainer class
-trainer = SiameseTrainer(model=model,
-                         train_iterator=train_iter,
-                         val_iterator=val_iter,
-                         optimizer=adam,
-                         device=device)
-trainer.epoch(n_epochs=2, clip=1, model_name='siamense-lstm.pt')

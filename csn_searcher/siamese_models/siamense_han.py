@@ -114,7 +114,7 @@ class MiddleLayer(nn.Module):
         return output, hidden
 
 
-class SiameseHierarchicalAttentionNetwork(nn.Module):
+class SiameseHierarchicalAttentionNet(nn.Module):
 
     def __init__(self):
         super().__init__()

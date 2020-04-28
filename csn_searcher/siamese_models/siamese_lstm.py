@@ -42,7 +42,7 @@ class SiameseLSTM(nn.Module):
         return hidden_toplayer
 
 
-class SiameseNet(nn.Module):
+class SiameseLSTMNet(nn.Module):
 
     def __init__(self,
                  input_dim,

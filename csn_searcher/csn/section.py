@@ -64,11 +64,20 @@ class Section:
             self.title = title
         self.body = self._format_section(paragraphs)
 
-    def _format_section(self, section):
+    def __repr__(self):
+        return self.title
+
+    def __len__(self):
+        return len(self.body)
+
+    def __iter__(self):
+        return iter(self.body)
+
+    def _format_section(self, paragraphs):
         """
         Parameters
         ----------
-        section : list of paragraphs
+        paragraphs : list of paragraphs
             It stores paragraphs as its elements.
 
         Returns
@@ -81,22 +90,17 @@ class Section:
         """
         body = []
         # decompose the body into paragraphs.
-        for para in section:
+        for para in paragraphs:
             paragraph = []
             # decompose paragraphs into sentences by scispacy
             with scispacy.disable_pipes("tagger"):
-                _para = scispacy(para)
+                _para = scispacy(para[0])
             for sentence in _para.sents:
                 # tokenize each sentence by scispacy
                 tokenized_sentence = [token.text for token in sentence]
                 paragraph.append(tokenized_sentence)
-                _text = scispacy(text)
             body.append(paragraph)
         return body
-
-    def num_paragraphs(self):
-        """ It returns the number of paragraphs in section. """
-        return len(self.body)
 
     def get_paragraphs(self):
         """ It returns all paragraphs in section. """
@@ -105,7 +109,7 @@ class Section:
     def num_sentences(self):
         """ It returns the number of sentences in section. """
         count = 0
-        for para in self.body
+        for para in self.body:
             count += len(para)
         return count
 

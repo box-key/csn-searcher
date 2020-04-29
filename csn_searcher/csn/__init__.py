@@ -1,2 +1,2 @@
 from .section import Section
-from .network import Network
+# from .network import Network

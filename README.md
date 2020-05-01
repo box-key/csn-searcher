@@ -3,7 +3,7 @@ COVID19 Scholarly-article Network (CSN) Searcher
 
 Description
 -----------
-CSN searcher leverages [Siamese RNN architecture](https://www.aaai.org/ocs/index.php/AAAI/AAAI16/paper/download/12195/12023) to provide document search on COVID-19 articles based on section-level similarity. You can provide the section you would like to explore more, and our tool finds research articles contain similar section. The network is built based on dataset generously provided by AI2 on Kaggle (link below).
+CSN searcher leverages Siamese RNN architecture proposed by [Mueller and Thyagarajan (2016)](https://www.aaai.org/ocs/index.php/AAAI/AAAI16/paper/download/12195/12023) to provide document search for COVID-19 articles based on section-level similarity. You can provide the section you would like to explore more, and our tool finds research articles contain similar section. The network is built based on dataset generously provided by AI2 on Kaggle (link below).
 
 * [Command-line tool](#command-line-tool)
 * [Dataset: COVID-19 Open Research Dataset Challenge (CORD-19)](https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge)
@@ -15,7 +15,7 @@ Requirements
 How to test
 -----------
 
-1. Activate your python virtual environment.
+1. Open your python virtual environment.
 
 1. Run the following command to install our package.
 ```bash

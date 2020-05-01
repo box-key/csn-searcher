@@ -22,7 +22,6 @@ How to run
 ```bash
 pip install -i https://test.pypi.org/simple/ csn-searcher==0.1.1
 ```
-
 Note: If you see an error message saying you need torchtext==0.5, please run the following:
 ```bash
 pip install torchtext==0.5
@@ -32,7 +31,6 @@ pip install torchtext==0.5
 ```bash
 csn-search
 ```
-
 It downloads the following data:
 * Siamese LSTM model (340MB)
 * CSN (680MB)

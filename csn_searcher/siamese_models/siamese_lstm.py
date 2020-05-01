@@ -78,5 +78,5 @@ class SiameseLSTMNet(nn.Module):
         # compute Siamese distance
         distance = torch.exp(-l1_norm)
         # since distance range is [0, 1], rescale it; default scaler is 1.0
-        output = l1_norm * self.score_scale
+        output = distance*self.score_scale
         return output

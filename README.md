@@ -5,19 +5,20 @@ Description
 -----------
 CSN searcher leverages Siamese RNN architecture proposed by [Mueller and Thyagarajan (2016)](https://www.aaai.org/ocs/index.php/AAAI/AAAI16/paper/download/12195/12023) to provide document search for COVID-19 articles based on section-level similarity. You can provide the section you would like to explore more, and our tool finds research articles contain similar section. The network is built based on dataset generously provided by AI2 on Kaggle (link below).
 
-* [Command-line tool](#command-line-tool)
+* [How to run](#how-to-run)
 * [Dataset: COVID-19 Open Research Dataset Challenge (CORD-19)](https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge)
+* [Command-line tool](#command-line-tool)
 
 Requirements
 ------------
 * Python 3.7 +
 
-How to test
+How to run
 -----------
 
 1. Open your python virtual environment.
 
-1. Run the following command to install our package.
+2. Run the following command to install our package.
 ```bash
 pip install -i https://test.pypi.org/simple/ csn-searcher==0.1.1
 ```
@@ -27,21 +28,20 @@ Note: If you see an error message saying you need torchtext==0.5, please run the
 pip install torchtext==0.5
 ```
 
-
-1. Run the following command to install data (sorry, this takes a while).
+3. Run the following command to install data (sorry, this takes a while).
 ```bash
 csn-search
 ```
+
 It downloads the following data:
 * Siamese LSTM model (340MB)
 * CSN (680MB)
 * Vocabulary (71KB)
 
-1. Create a .txt file with some input. For example, [this website (The New  England Journal of Medicine)](https://www.nejm.org/coronavirus) lists some articles related to COVID-19.
+4. Create a .txt file with some input. For example, [this website (The New  England Journal of Medicine)](https://www.nejm.org/coronavirus) lists some articles related to COVID-19.
 Copy some section in an article and store it in a txt file, e.g. `input.txt`.
 
-1. Run the following command to query the most similar articles in the CSN.
-
+5. Run the following command to query the most similar articles in the CSN.
 ```bash
 csn-search \
   --input-path input.txt \

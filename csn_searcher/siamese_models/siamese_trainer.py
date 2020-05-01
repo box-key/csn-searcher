@@ -31,6 +31,7 @@ class SiameseTrainer():
         self.weight_initializer = weight_initializer
         self.init_model()
         self.device = device
+        self.best_valid_loss = 0
 
     def init_model(self):
         if self.weight_initializer is None:
@@ -42,18 +43,16 @@ class SiameseTrainer():
         self.model.train()
         epoch_loss = 0
         for batch in self.train_iterator:
-            text_left = batch['text_left']
-            text_right = batch['text_right']
+            text_left = batch.text_left
+            text_right = batch.text_right
             # print(text_left)
             # text_left = [text_left_len, batch_size]
             # text_right = [text_right_len, batch_size]
-            scores = batch['score'] # it returns a list
+            scores = batch.score # it returns a list
             scores = torch.FloatTensor(scores).to(self.device)
             # scores = [batch_size]
             predictions = self.model(text_left, text_right)
             # predictions = [batch_size]
-            print('golden label:', scores)
-            print('given similarity', predictions)
             loss = self.criterion(predictions, scores)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), clip)
@@ -79,14 +78,14 @@ class SiameseTrainer():
         return epoch_loss / len(iterator)
 
     def epoch(self, n_epochs, clip, model_name='siamense.pt'):
-        best_valid_loss = float('inf')
+        self.best_valid_loss = float('inf')
         for epoch in range(n_epochs):
             start_time = time.time()
             train_loss = self.train(clip)
             valid_loss = self.evaluate(self.val_iterator)
             epoch_mins, epoch_secs = _epoch_time(start_time)
-            if valid_loss < best_valid_loss:
-                best_valid_loss = valid_loss
+            if valid_loss < self.best_valid_loss:
+                self.best_valid_loss = valid_loss
                 torch.save(self.model.state_dict(), model_name)
             print(f'Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s')
             print(f'\tTrain MSE Loss: {train_loss:.3f}')
@@ -96,3 +95,26 @@ class SiameseTrainer():
         if model_name is not None:
             self.model.load_state_dict(torch.load(model_name))
         return self.evaluate(iterator)
+
+    def accuracy(self, iterator, model_name=None):
+        if model_name is not None:
+            self.model.load_state_dict(torch.load(model_name))
+        self.model.eval()
+        hit = 0
+        for batch in iterator:
+            text_left = batch.text_left
+            text_right = batch.text_right
+            # text_left = [text_left_len, batch_size]
+            # text_right = [text_right_len, batch_size]
+            scores = batch.score # it returns a list
+            scores = torch.FloatTensor(scores).to(self.device)
+            # score = [batch_size]
+            predictions = self.model(text_left, text_right)
+            # predictions = [batch_size]
+            scores = torch.round(scores)
+            predictions = torch.round(predictions)
+            # perform element wise equality check
+            comparison = torch.eq(scores, predictions)
+            # comparison = [batch_size]
+            hit += comparison.sum().int()
+        return hit/len(iterator)

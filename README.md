@@ -17,28 +17,24 @@ How to run
 -----------
 
 1. Open your python virtual environment.
-
 2. Run the following command to install our package.
 ```bash
 pip install -i https://test.pypi.org/simple/ csn-searcher==0.1.1
 ```
-Note: If you see an error message saying you need torchtext==0.5, please run the following:
+> Note: If you see an error message saying you need torchtext==0.5, please run the following:
 ```bash
 pip install torchtext==0.5
 ```
-
 3. Run the following command to install data (sorry, this takes a while).
 ```bash
 csn-search
 ```
-It downloads the following data:
-* Siamese LSTM model (340MB)
-* CSN (680MB)
-* Vocabulary (71KB)
-
+> It downloads the following data:
+ > - Siamese LSTM model (340MB)
+ > - CSN (680MB)
+ > - Vocabulary (71KB)
 4. Create a .txt file with some input. For example, [this website (The New  England Journal of Medicine)](https://www.nejm.org/coronavirus) lists some articles related to COVID-19.
 Copy some section in an article and store it in a txt file, e.g. `input.txt`.
-
 5. Run the following command to query the most similar articles in the CSN.
 ```bash
 csn-search \

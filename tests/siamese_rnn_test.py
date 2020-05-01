@@ -7,8 +7,8 @@ from torchtext.data import Field, RawField
 from torchtext.data import TabularDataset
 from torchtext.data import Iterator, BucketIterator
 
-from shannet import SiameseNet, SiameseTrainer
-from shannet.siamese_lstm import SiameseLSTM
+from csn_searcher.siamese_models.siamese_trainer import SiameseTrainer
+from csn_searcher.siamese_models.siamese_lstm import SiameseLSTMNet
 
 
 # load tokenizer
@@ -55,8 +55,7 @@ EMB_DIM = 300
 HID_DIM = 1024
 DROPOUT = 0.2
 N_LAYERS = 4
-# define model
-model = SiameseNet(
+model = SiameseLSTMNet(
             input_dim=len(TEXT.vocab),
             emb_dim=EMB_DIM,
             hid_dim=HID_DIM,
@@ -65,7 +64,8 @@ model = SiameseNet(
             pad_idx=PAD_IDX,
             device=device,
         )
-adam = torch.optim.Adam(model.parameters(), lr=0.0001)
+LEARNING_RATE = 0.0001
+adam = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 # check initializer of trainer class
 trainer = SiameseTrainer(model=model,
                          train_iterator=train_iter,
@@ -115,7 +115,7 @@ class TestSiamenseLSTM:
 
     def test_epoch(self):
         """ Test epoch method in SiameseTrainer """
-        model = SiameseNet(
+        model = SiameseLSTMNet(
                     input_dim=len(TEXT.vocab),
                     emb_dim=EMB_DIM,
                     hid_dim=HID_DIM,

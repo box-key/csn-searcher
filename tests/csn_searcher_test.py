@@ -1,5 +1,7 @@
 import pytest
 
+import random
+
 try:
     import spacy
 except ImportError:
@@ -11,9 +13,10 @@ except OSError:
     raise OSError('model is not installed, please try the following:\n',
                   '`pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.4/en_core_sci_sm-0.2.4.tar.gz`')
 
-from csn_searcher.csn.section import Section
+from csn_searcher.csn.section import Section, SectionPairs
 from csn_searcher.csn.article import Article, ArticleList
 from csn_searcher.csn import utils
+
 
 
 class TestSection:
@@ -57,7 +60,7 @@ class TestSection:
                 ['I bought a new pair of shoes. They\'re awesome'],
                 ['This is a test. Hello world.']]
         # section formatter should produce 3 paragraphs, 6 sentences
-        section = Section(0, body, 'Test')
+        section = Section(0, body, 'test')
         assert len(section) == 3
         for para in section:
             assert len(para) == 2
@@ -69,7 +72,7 @@ class TestSection:
                 ['I bought a new pair of shoes. They\'re awesome'],
                 ['This is a test. Hello world.']]
         # section formatter should produce 3 paragraphs, 6 sentences
-        section = Section(0, body, 'Test')
+        section = Section(0, body, 'test')
         para = section.get_paragraphs()
         assert len(para) == 3
         num_sen = section.num_sentences()
@@ -85,14 +88,14 @@ class TestSection:
 class TestArticle:
 
     def test_article(self):
-        article = Article(1, 'Test')
-        assert repr(article) == 'Test'
+        article = Article(1, 'test')
+        assert repr(article) == 'test'
         assert len(article) == 0
         body = [['I have a pen. I have an apple'],
                 ['I bought a new pair of shoes. They\'re awesome'],
                 ['This is a test. Hello world.']]
         # section formatter should produce 3 paragraphs, 6 sentences
-        section = Section(0, body, 'Test')
+        section = Section(0, body, 'test')
         article.append(section)
         assert len(article) == 1
         assert article[0] == section
@@ -100,9 +103,9 @@ class TestArticle:
     def test_article_list(self):
         list = ArticleList()
         assert len(list) == 0
-        article1 = Article(1, 'Test')
+        article1 = Article(1, 'test')
         list[1] = article1
-        article2 = Article(2, 'Test')
+        article2 = Article(2, 'test')
         list[2] = article2
         assert len(list) == 2
         del list[1]
@@ -158,7 +161,7 @@ class TestArticle:
         # test for biorxiv
         biorxiv = list[0]
         # check the last section
-        assert repr(biorxiv[-1]) == 'Gene'
+        assert repr(biorxiv[-1]) == 'gene'
         # check the number of paragraphs
         assert len(biorxiv[1]) == 6
         # check the number of paragraphs
@@ -166,7 +169,7 @@ class TestArticle:
         # test for comm
         comm = list[1]
         # check the last section
-        assert repr(comm[-1]) == 'Conclusions'
+        assert repr(comm[-1]) == 'conclusions'
         # check the number of paragraphs
         assert len(comm[2]) == 1
         # check the number of paragraphs
@@ -174,7 +177,7 @@ class TestArticle:
         # test for noncomm
         noncomm = list[2]
         # check the last section
-        assert repr(noncomm[-1]) == 'DISCUSSION'
+        assert repr(noncomm[-1]) == 'discussion'
         # check the number of paragraphs
         assert len(noncomm[1]) == 3
         # check the number of paragraphs
@@ -182,8 +185,23 @@ class TestArticle:
         # test for pmc
         pmc = list[3]
         # check the last section
-        assert repr(pmc[-1]) == 'Discussion'
+        assert repr(pmc[-1]) == 'discussion'
         # check the number of paragraphs
         assert len(pmc[0]) == 5
         # check the number of paragraphs
         assert len(pmc[3]) == 2
+
+    def test_loadings_master_dataset(self):
+        list = ArticleList()
+        biorxiv = 'C:\\Users\\under\\Datasets\\CORD-19-research-challenge\\2020-03-13\\biorxiv_medrxiv\\biorxiv_medrxiv'
+        list.add_articles(biorxiv)
+        print('Finished reading biorxiv')
+        comm = 'C:\\Users\\under\\Datasets\\CORD-19-research-challenge\\2020-03-13\\comm_use_subset\\comm_use_subset'
+        list.add_articles(comm)
+        print('Finished reading comm')
+        noncomm = 'C:\\Users\\under\\Datasets\\CORD-19-research-challenge\\2020-03-13\\noncomm_use_subset\\noncomm_use_subset'
+        list.add_articles(noncomm)
+        print('Finished reading noncomm')
+        pmc = 'C:\\Users\\under\\Datasets\\CORD-19-research-challenge\\2020-03-13\\pmc_custom_license\\pmc_custom_license'
+        list.add_articles(pmc)
+        print('Finished reading pmc')

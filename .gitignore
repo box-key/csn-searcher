@@ -10,6 +10,17 @@
 
 # Cache
 __pycache__/
-.shannet
+.csn_searcher
 __pycache__/
 .vector_cache/
+
+
+# data
+*.List
+*.Lookup
+*.Field
+
+
+# build
+*.egg-info
+dist/

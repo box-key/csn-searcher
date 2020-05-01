@@ -1,41 +1,7 @@
 import json
 
-try:
-    import spacy
-except ImportError:
-    raise ImportError('spacy is missing, please run `pip install spacy` and `pip install scispacy`.')
-
-try:
-    scispacy = spacy.load('en_core_sci_sm')
-except OSError:
-    raise OSError('model is not installed, please try the following:\n',
-                  '`pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.4/en_core_sci_sm-0.2.4.tar.gz`')
-
 
 EMPTY_SYMBOL = 'NA'
-
-
-class SectionPairs:
-    """
-    This class is to store pairs of sections with their seimilarity scores
-    in json format to be read into torchtext.
-
-    Attributes
-    ----------
-    sections_left : list of Section objects
-        It contains the left side of section pairs.
-    sections_right : list of Section objects
-        It contains the left side of section pairs.
-    similarity_scores : list of float
-        It stores the similarity scores of section pairs.
-    """
-    def __init__(self, pairs, scores):
-        self.sections_left = [pair[0] for pair in pairs]
-        self.sections_right = [pair[1] for pair in pairs]
-        self.similarity_scores = scores
-
-    def to_json(self):
-        return json.dumps(self.__dict__)
 
 
 class Section:
@@ -55,14 +21,16 @@ class Section:
     vector : tensor
         Section vector of output_dim defined in siamese_models module.
     """
-    def __init__(self, article_id, paragraphs, title, vector=None):
+    def __init__(self, article_id, paragraphs, title, citations=None, vector=None):
         self.article_id = article_id
         self.vector = vector
         if len(title) == 0:
             self.title = EMPTY_SYMBOL
         else:
+            # self.title = title.lower()
             self.title = title
         self.body = self._format_section(paragraphs)
+        self.citations = citations
 
     def __repr__(self):
         return self.title
@@ -74,6 +42,17 @@ class Section:
         return iter(self.body)
 
     def _format_section(self, paragraphs):
+        # Avoid throwing error during testing
+        try:
+            import spacy
+        except ImportError:
+            raise ImportError('spacy is missing, please run `pip install spacy` and `pip install scispacy`.')
+
+        try:
+            scispacy = spacy.load('en_core_sci_sm')
+        except OSError:
+            raise OSError('model is not installed, please try the following:\n',
+                          '`pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.4/en_core_sci_sm-0.2.4.tar.gz`')
         """
         Parameters
         ----------
@@ -93,8 +72,9 @@ class Section:
         for para in paragraphs:
             paragraph = []
             # decompose paragraphs into sentences by scispacy
+            # clean texts here
             with scispacy.disable_pipes("tagger"):
-                _para = scispacy(para[0])
+                _para = scispacy(para)
             for sentence in _para.sents:
                 # tokenize each sentence by scispacy
                 tokenized_sentence = [token.text for token in sentence]

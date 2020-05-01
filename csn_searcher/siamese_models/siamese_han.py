@@ -26,8 +26,10 @@ class TokenLayer(nn.Module):
         self.fc_out = nn.Linear(hid_dim*2, hid_dim)
 
     def forward(self, sentence):
+        print(sentence.shape)
         # text = [sentence_len, batch_size]
         embedded = self.embedding(sentence)
+        print(embedded.shape)
         # embedded = [sentence_len, batch_size, emb_dim]
         output, (hidden, cell) = self.lstm(embedded)
         # output = [sentence_len, batch_size, hid_dim*2]
@@ -87,6 +89,7 @@ class MiddleLayer(nn.Module):
                  device):
         super().__init__()
         self.attention = Attention(prev_hid_dim=prev_hid_dim,
+                                   curr_hid_dim=curr_hid_dim,
                                    device=device)
         self.lstm = nn.LSTM(prev_hid_dim*2 + curr_hid_dim,
                             curr_hid_dim,
@@ -116,7 +119,18 @@ class MiddleLayer(nn.Module):
 
 class SiameseHierarchicalAttentionNet(nn.Module):
 
-    def __init__(self):
+    def __init__(self,
+                 input_dim,
+                 emb_dim,
+                 token_hid_dim,
+                 sen_hid_dim,
+                 para_hid_dim,
+                 output_dim,
+                 n_layers,
+                 dropout,
+                 pad_idx,
+                 sos_idx,
+                 device):
         super().__init__()
         self.token_layer = TokenLayer(input_dim=input_dim,
                                       emb_dim=emb_dim,
@@ -139,10 +153,9 @@ class SiameseHierarchicalAttentionNet(nn.Module):
                                    curr_hid_dim=output_dim,
                                    device=device)
         self.pad_idx = pad_idx
-        self.batch_size = batch_size
         self.sen_hid_dim = sen_hid_dim
         self.para_hid_dim = para_hid_dim
-        self.sos_tensor = torch.zeros(self.batch_size) + sos_idx
+        self.sos_tensor = torch.FloatTensor([sos_idx])
 
     def create_mask(self, text):
         # text = [text_len, batch_size]
@@ -150,7 +163,7 @@ class SiameseHierarchicalAttentionNet(nn.Module):
         # mask = [text_len, batch_size]
         return mask
 
-    def sec2vec(section, batch_size):
+    def sec2vec(self, section_body):
         # section_len = the number of paragraphs per sentence
         # paragraph_len = the number of sentences per paragraph
         # sentence_len = the number of words per sentence
@@ -159,10 +172,10 @@ class SiameseHierarchicalAttentionNet(nn.Module):
         # initial state for paragraph and sentense are <sos>
         para_hidden = self.sos_tensor
         sen_hidden = self.sos_tensor
-        for row_para, paragraph in enumerate(section):
+        for paragraph in section_body:
             # store sentence-level hihdden vectors
             sentence_outputs = []
-            for row_sen, sentence in enumerate(paragrapha):
+            for sentence in paragraph:
                 # get token-level hidden nodes
                 token_outptus, _ = self.token_layer(sentence)
                 mask = self.create_mask(sentence)
@@ -189,10 +202,20 @@ class SiameseHierarchicalAttentionNet(nn.Module):
         # section_vector = [batch_size, output_dim]
         return section_vector
 
-    def forward(self, section_left, section_right):
-        output_left = self.sec2vec(section_left)
+    def forward(self, section_left_batch, section_right_batch):
+        output_left = []
+        for section_left in section_left_batch:
+            output = self.sec2vec(section_left)
+            # output = [1, output_dim]
+            output_left.append(output)
+        output_left = torch.cat(output_left, dim=0)
         # output_left = [batch_size, output_dim]
-        output_right = self.sec2vec(seection_right)
+        output_right = []
+        for section_right in section_right_batch:
+            output = self.sec2vec(section_right)
+            # output = [1, output_dim]
+            output_right.append(output)
+        output_right = torch.cat(output_right, dim=0)
         # output_right = [batch_size, output_dim]
         # calculate l1 norm between left and right outputs
         l1_norm = torch.norm(output_left - output_right, p=1, dim=1)

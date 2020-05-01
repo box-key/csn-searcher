@@ -42,15 +42,18 @@ class SiameseTrainer():
         self.model.train()
         epoch_loss = 0
         for batch in self.train_iterator:
-            text_left = batch.text_left
-            text_right = batch.text_right
+            text_left = batch['text_left']
+            text_right = batch['text_right']
+            # print(text_left)
             # text_left = [text_left_len, batch_size]
             # text_right = [text_right_len, batch_size]
-            scores = batch.score # it returns a list
+            scores = batch['score'] # it returns a list
             scores = torch.FloatTensor(scores).to(self.device)
             # scores = [batch_size]
             predictions = self.model(text_left, text_right)
             # predictions = [batch_size]
+            print('golden label:', scores)
+            print('given similarity', predictions)
             loss = self.criterion(predictions, scores)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), clip)

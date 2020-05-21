@@ -1,5 +1,6 @@
 COVID19 Scholarly-article Network (CSN) Searcher
 ------------------------------------------------
+[![alt text](https://github.com/box-key/csn-searcher/blob/master/image/lumiata_covid19_hackathon.png)](https://devpost.com/software/documentnet)
 
 Description
 -----------

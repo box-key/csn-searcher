@@ -1,5 +1,7 @@
 COVID19 Scholarly-article Network (CSN) Searcher
 ------------------------------------------------
+This project won 2nd prize at [Lumiata COVID-19 Global AI Hackathon](https://www.lumiata.com/lumiata-covid-19-global-ai-hackathon/).
+Click the image below to see more details.
 
 <p align="center">
  <a href='https://devpost.com/software/documentnet'>

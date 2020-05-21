@@ -3,7 +3,7 @@ COVID19 Scholarly-article Network (CSN) Searcher
 
 <p align="center">
  <a href='https://devpost.com/software/documentnet'>
-   <img src='image/lumiata_covid19_hackathon.png' class='center' width='600' height='400'>
+   <img src='image/lumiata_covid19_hackathon.png' class='center' width='70%' height='70%'>
  </a>
 </p>
 

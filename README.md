@@ -1,7 +1,7 @@
 COVID19 Scholarly-article Network (CSN) Searcher
 ------------------------------------------------
 
-[![alt text]('image/lumiata_covid19_hackathon.png'){height="50%" width="70%"}]('https://devpost.com/software/documentnet')
+[![alt text](image/lumiata_covid19_hackathon.png){height="50%" width="70%"}](https://devpost.com/software/documentnet)
 
 Description
 -----------

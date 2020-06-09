@@ -1,0 +1,13 @@
+[Unit]
+Description=uWSGI instance to serve myproject
+After=network.target
+
+[Service]
+User=ubuntu
+Group=root
+WorkingDirectory=/home/ubuntu/csn-search/scan-master
+Environment="PATH=/home/ubuntu/.local/bin"
+ExecStart=/home/ubuntu/.local/bin/uwsgi --ini search_api.ini
+
+[Install]
+WantedBy=multi-user.target

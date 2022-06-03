@@ -17,7 +17,7 @@
     "@angular/cdk": "github:angular/cdk-builds",
     "@angular/common": "~9.1.9",
     "@angular/compiler": "~9.1.9",
-    "@angular/core": "~9.1.9",
+    "@angular/core": "~11.0.5",
     "@angular/forms": "~9.1.9",
     "@angular/material": "github:angular/material2-builds",
     "@angular/platform-browser": "~9.1.9",
